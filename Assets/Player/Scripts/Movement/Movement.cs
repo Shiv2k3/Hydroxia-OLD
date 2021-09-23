@@ -26,7 +26,9 @@ public class Movement : MonoBehaviour
     [FoldoutGroup("Movement Settings")]
     [SerializeField] private LayerMask walkableLayers;
     [FoldoutGroup("Movement Settings")]
-    [SerializeField] private bool applyPlanetRotation = true;
+    [SerializeField] private bool onPlanet = true;
+    [FoldoutGroup("Movement Settings")]
+    [SerializeField] private bool useGravity;
     [FoldoutGroup("Movement Settings")]
     [SerializeField] private float moveSpeed = 7;
     [HideInInspector] private bool inventoryClosed;
@@ -62,7 +64,9 @@ public class Movement : MonoBehaviour
     [FoldoutGroup("Grappel Settings")]
     [SerializeField] private LayerMask grappelableLayers;
     [FoldoutGroup("Grappel Settings")]
-    [SerializeField] private Transform grappelOrigin;
+    [SerializeField] private Transform grappelMachineTransform;
+    [FoldoutGroup("Grappel Settings")]
+    [SerializeField] private Transform grappleHookTransform;
     [FoldoutGroup("Grappel Settings")]
     [SerializeField] private float grappelStrength = 10;
     [FoldoutGroup("Grappel Settings")]
@@ -86,6 +90,7 @@ public class Movement : MonoBehaviour
     private Vector2 moveInput;
     private Vector2 lookInput;
     private Vector2 lookInputDir;
+
     // ============================================================================================//
     #endregion
     // ============================================================================================//
@@ -95,14 +100,16 @@ public class Movement : MonoBehaviour
         if (transform.GetChild(0).localPosition.y != 1) Debug.Log("Y of mesh is not set to 1, if it no longer needs this value change value on the script called BodyHelper.cs    ");
         bodyManager = BodyManager.Instance;
         bodyID = bodyManager.AddNewBody(GetComponent<Rigidbody>(), waterCollisionDamping);
+        bodyManager.ToggleUseGravity(bodyID, useGravity);
+        bodyManager.ToggleOnPlanet(bodyID, onPlanet);
 
         //  MOVEMENT CLASSES INITIALIZATION
-        player = new ThirdPersonController(inputs, playerRigidbody, playerSkin, camera, movementDamping, bodyID, applyPlanetRotation, walkableLayers);
+        player = new ThirdPersonController(inputs, playerRigidbody, playerSkin, camera, movementDamping, bodyID, onPlanet, walkableLayers);
         cam = new ThirdPersonCamera(camera, offset, cameraCollisionLayers, playerLayer, movementDamping, cameraCollisionDistance, clamp);
         jump = new CharacterJumping(playerRigidbody, jumpPower, swimUpPower, jumpCooldown, swimUpCooldown, jumpableLayers, bodyID);
         crouch = new CharacterCrouching(playerRigidbody, divePower, diveCooldown, bodyID);
         grappling = gameObject.AddComponent<CharacterGrappling>();
-        grappling.Construct(camera, playerRigidbody, grappelRange, grappelStrength, grappelableLayers, grappelOrigin, grappleBreakDistance, bodyID);
+        grappling.Construct(camera, playerRigidbody, grappelRange, grappelStrength, grappelableLayers, grappelMachineTransform, grappleHookTransform, grappleBreakDistance, bodyID);
     }
     // ============================================================================================//
     private void FixedUpdate()
@@ -117,7 +124,7 @@ public class Movement : MonoBehaviour
     private void Update()
     {
         // GRAPPELING
-        isUsingGrapple = grappling.UpdateState(inventoryClosed && inputs.Player.Grapple.triggered, canMove);
+        isUsingGrapple = grappling.UpdateState(inventoryClosed && inputs.Player.Grapple.triggered);
     }
     // ============================================================================================//
     private void GetInput()
@@ -136,7 +143,7 @@ public class Movement : MonoBehaviour
     {
         inventoryClosed = Cursor.lockState == CursorLockMode.Locked;
 
-        if (inventoryClosed && ! isUsingGrapple)
+        if (inventoryClosed && !isUsingGrapple)
         {
             // UPDATE AND MOVE PLAYER
             player.UpdateInput(moveInput, lookInput, lookInputDir);

@@ -1879,9 +1879,10 @@ MonoBehaviour:
   grappelableLayers:
     serializedVersion: 2
     m_Bits: 520
-  grappelOrigin: {fileID: 6534640338278895791}
-  grappelStrength: 10
-  grappelRange: 25
+  grappelMachineTransform: {fileID: 6534640338278895791}
+  grappleHookTransform: {fileID: 7709800239734683662}
+  grappelStrength: 3
+  grappelRange: 45
   grappleBreakDistance: 1
 --- !u!114 &1065532218926289899
 MonoBehaviour:
@@ -3476,8 +3477,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8188054096302688459}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.49149188}
-  m_LocalScale: {x: 0.72172, y: 0.72172, z: 0.72172}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.72172, y: 0.72172, z: 1.1727692}
   m_Children: []
   m_Father: {fileID: 6534640338278895791}
   m_RootOrder: 0

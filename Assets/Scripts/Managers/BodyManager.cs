@@ -3,15 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class BodyManager : MonoBehaviour
 {
-    [Header("Gravity")]
-    [SerializeField] private float gravityPower = -9.18f;
-
-    [Header("Water")]
-    [SerializeField] private LayerMask _waterLayer;
-    [HideInInspector] public static LayerMask WaterLayer { get { return Instance._waterLayer; } }
-    // Private
-    [SerializeField] private List<Body> bodies;
-    private Vector3 force;
+    #region SINGLETON
     private static BodyManager _instance;
     public static BodyManager Instance
     {
@@ -32,51 +24,56 @@ public class BodyManager : MonoBehaviour
                 Destroy(value.gameObject);
         }
     }
-    public void Awake()
+
+    #endregion
+
+    [Header("Gravity")]
+    [SerializeField] private float gravityPower = -9.18f;
+
+    [Header("Water")]
+    [SerializeField] private LayerMask _waterLayer;
+    [HideInInspector] public static LayerMask WaterLayer { get { return Instance._waterLayer; } }
+    
+    [SerializeField] private List<Body> bodies;
+    void Awake()
     {
         bodies = new List<Body>(bodies);
     }
-    Vector3 bodyVelocity;
-    private void FixedUpdate()
+    // UPDATE
+    void FixedUpdate()
     {
         for (int i = 0; i < bodies.Count; i++)
         {
             if (bodies[i].useGravity == false) continue;
 
-            bodyVelocity = bodies[i].rb.worldCenterOfMass.normalized * bodies[i].rb.mass;
+            Vector3  bodyVelocity = (bodies[i].onPlanet ? bodies[i].rb.worldCenterOfMass.normalized : Vector3.up) * bodies[i].rb.mass;
 
             if (bodies[i].AboveWaterCheck)
             {
                 if (gravityPower != 0)
                 {
-                    force = bodyVelocity * gravityPower;
-                    bodies[i].rb.AddForce(force);
+                    Vector3 force = bodyVelocity * gravityPower;
+                    bodies[i].rb.AddForce(force, ForceMode.Force);
                     continue;
                 }
             }
             else
             {
-                force = Vector3.Lerp(force, Vector3.zero, bodies[i]._waterCollisionDamping);
-                bodies[i].rb.velocity = force;
+                Vector3 velocity = Vector3.Lerp(bodies[i].rb.velocity, Vector3.zero, bodies[i]._waterCollisionDamping);
+                bodies[i].rb.velocity = velocity;
                 continue;
             }
         }
 
     }
-    public void UpdateBodyRotation(int i)
-    {
-        Vector3 bodyUp = bodies[i].rb.rotation * Vector3.up;
-        Vector3 gravityUp = bodies[i].rb.position.normalized;
 
-        bodies[i].rb.MoveRotation(Quaternion.FromToRotation(bodyUp, gravityUp) * bodies[i].rb.rotation);
-    }
-
+    // PUBLIC METHODS
     public int AddNewBody(Rigidbody rb, float waterCollisionDamping)
     {
         bodies.Add(new Body(rb, waterCollisionDamping, _waterLayer));
         return bodies.Count - 1;
     }
-    public static bool IsBodyUnderWater(int index)
+    public static bool IsBodyUnderWater(int    index)
     {
         if (Instance)
             return Instance.bodies[index].AboveWaterCheck;
@@ -84,6 +81,8 @@ public class BodyManager : MonoBehaviour
     }
     public void ToggleUseGravity(int i, bool state) => bodies[i].useGravity = state;
     public bool GetUseGravity(int i) => bodies[i].useGravity;
+    public void ToggleOnPlanet(int i, bool state) => bodies[i].onPlanet = state;
+    public bool GetOnPlanet(int i) => bodies[i].onPlanet;
 }
 
 [Serializable]
@@ -96,6 +95,7 @@ public class Body
     public Vector3 centerOfMassInWorld;
     public float _waterCollisionDamping = .09f;
     public bool useGravity = true;
+    public bool onPlanet = true;
 
     private Vector3 massCenter;
 
