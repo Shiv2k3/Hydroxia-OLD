@@ -20,111 +20,104 @@ public class CharacterGrappling : MonoBehaviour
     private int _bodyID;
 
     // GRAPPLE INFO
-    private Vector3 _grappleToPos;
-    public bool _usingGrapple;
+    public bool _throwingGrapple;
+    public bool _retractingGrapple;
+    public bool _movingToGrapple;
+    public bool _grappled;
     Ray _cameraRay;
     Ray _playerRay;
     RaycastHit rayHit;
     private bool _useGravityState;
     private bool _isKinematic;
+    Coroutine throwGrapple;
+    Coroutine moveToGrapple;
 
-    Coroutine throwHook;
-    void UseGrapple() => throwHook = StartCoroutine(ThrowHook());
-
-    private IEnumerator ThrowHook()
-    {
-        Debug.Log("Throwing Hook");
-
-        // GET HOOK READY
-        _hookT.parent = null;
-        hookThrown = true;
-
-        // LERP INFO
-        int steps = (int)(rayHit.distance / _grappleStrength);
-        Vector3 hookPosition = _hookT.position;
-
-        for (float i = 0; i < steps; i++)
-        {
-            _hookT.position = Vector3.Lerp(hookPosition, _grappleToPos, (i + 1) / steps);
-
-            yield return null;
-        }
-
-        hookThrown = false;
-        StartCoroutine(GoToGrapple());
-    }
-    private IEnumerator GoToGrapple()
-    {
-        // GET PLAYER READY
-        _usingGrapple = true;
-        BodyManager.Instance.ToggleUseGravity(_bodyID, false);
-
-        // GET LERP INFO
-        int steps = (int)(rayHit.distance / _grappleStrength);
-        Vector3 playerPosition = _rb.position;
-
-        for (float i = 0; i < steps; i++)
-        {
-            _rb.position = Vector3.Lerp(playerPosition, _grappleToPos, (i + 1) / steps);
-
-            yield return null;
-        }
-
-        // AFTERMATH
-        _rb.velocity = Vector3.zero;
-    }
-    private IEnumerator RetractGrapple()
-    {
-        if (throwHook != null) StopCoroutine(throwHook);
-
-        Debug.Log("Retracting Hook");
-
-        // GET HOOK READY
-        BodyManager.Instance.ToggleUseGravity(_bodyID, true);
-        _usingGrapple = false;
-        _hookT.parent = _grappleT;
-        retractingHook = true;
-
-        // GET LERP INFO
-        int steps = (int)Vector3.Distance(_hookT.position, _grappleT.position);
-        Vector3 hookPosition = _hookT.localPosition;
-
-        for (float i = 0; i < steps; i++)
-        {
-            _hookT.localPosition = Vector3.Lerp(hookPosition, Vector3.zero, (i + 1) / steps);
-
-            yield return null;
-        }
-
-        // FINAL 
-        retractingHook = false;
-        hookThrown = false;
-    }
-
-    public bool canGrapple;
-    public bool hookThrown;
-    public bool retractingHook;
     public bool UpdateState(bool grappelInput)
     {
         if (grappelInput)
         {
-            if (!_usingGrapple && !hookThrown && !retractingHook)
+            if (_grappled || _throwingGrapple || _movingToGrapple)
             {
-                _grappleToPos = GetGrappledInfo();
-                canGrapple = _grappleToPos != Vector3.zero;
+                if (throwGrapple != null) StopCoroutine(throwGrapple);
+                if (moveToGrapple != null) StopCoroutine(moveToGrapple);
 
-                if (canGrapple)
-                    UseGrapple();
-            }
-            else if (!retractingHook)
-            {
                 StartCoroutine(RetractGrapple());
+            }
+            else if (_throwingGrapple == false && _retractingGrapple == false && _movingToGrapple == false)
+            {
+                Vector3 grappleTo = GetGrappledInfo();
+                if (grappleTo != Vector3.zero) throwGrapple = StartCoroutine(ThrowGrapple(grappleTo));
             }
 
         }
 
-        return _usingGrapple;
+        bool usingGrapple = _movingToGrapple || _grappled;
+
+        return usingGrapple;
     }
+
+    private IEnumerator ThrowGrapple(Vector3 grappleTo)
+    {
+        _throwingGrapple = true;
+        _hookT.parent = null;
+
+        int steps = (int)(rayHit.distance / _grappleStrength);
+        Vector3 start = _hookT.position;
+
+        for (float i = 0; i < steps; i++)
+        {
+            _hookT.position = Vector3.Lerp(start, grappleTo, (i + 1) / steps);
+            yield return null;
+        }
+
+        _throwingGrapple = false;
+
+        moveToGrapple = StartCoroutine(MoveToGrapple(grappleTo));
+    }
+    private IEnumerator MoveToGrapple(Vector3 moveTo)
+    {
+        _movingToGrapple = true;
+
+        BodyManager.Instance.ToggleUseGravity(_bodyID, false);
+        _rb.isKinematic = true;
+
+        int steps = (int)(rayHit.distance / _grappleStrength);
+        Vector3 start = _rb.position;
+
+        for (float i = 0; i < steps; i++)
+        {
+            _rb.position = Vector3.Lerp(start, moveTo, (i + 1) / steps);
+            yield return null;
+        }
+
+        _grappled = true;
+        _movingToGrapple = false;
+    }
+    private IEnumerator RetractGrapple()
+    {
+        _retractingGrapple = true;
+        _grappled = false;
+        _movingToGrapple = false;
+        _throwingGrapple = false;
+
+        BodyManager.Instance.ToggleUseGravity(_bodyID, true);
+        _rb.isKinematic = false;
+
+        int steps = (int)(Vector3.Distance(_hookT.position, _grappleT.position) / _grappleStrength);
+        Vector3 start = _hookT.position;
+
+        for (float i = 0; i < steps; i++)
+        {
+            _hookT.position = Vector3.Lerp(start, _grappleT.position, (i + 1) / steps);
+            yield return null;
+        }
+
+        _hookT.parent = _grappleT;
+        _hookT.localPosition = Vector3.zero;
+        _hookT.localRotation = Quaternion.identity;
+        _retractingGrapple = false;
+    }
+
     public void Construct(Camera camera, Rigidbody playerRigidbody, float grappelRange, float grappelStrength, LayerMask grappelableLayers, Transform grappelT, Transform hookT, float grappleBreakDistance, int bodyID)
     {
         _camera = camera;

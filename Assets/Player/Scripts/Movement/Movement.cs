@@ -120,7 +120,6 @@ public class Movement : MonoBehaviour
         // SAVE DATA AND EXECUTE MOVEMENT
         SendInput();
     }
-
     private void Update()
     {
         // GRAPPELING
