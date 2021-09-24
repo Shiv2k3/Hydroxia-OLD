@@ -31,6 +31,8 @@ public class Movement : MonoBehaviour
     [SerializeField] private bool useGravity;
     [FoldoutGroup("Movement Settings")]
     [SerializeField] private float moveSpeed = 7;
+    [FoldoutGroup("Movement Settings")]
+    [SerializeField] private float maxSpeed = 7;
     [HideInInspector] private bool inventoryClosed;
     [HideInInspector] private bool canMove = true;
     // ============================================================================================//
@@ -90,7 +92,6 @@ public class Movement : MonoBehaviour
     private Vector2 moveInput;
     private Vector2 lookInput;
     private Vector2 lookInputDir;
-
     // ============================================================================================//
     #endregion
     // ============================================================================================//
@@ -104,12 +105,12 @@ public class Movement : MonoBehaviour
         bodyManager.ToggleOnPlanet(bodyID, onPlanet);
 
         //  MOVEMENT CLASSES INITIALIZATION
-        player = new ThirdPersonController(inputs, playerRigidbody, playerSkin, camera, movementDamping, bodyID, onPlanet, walkableLayers);
+        player = new ThirdPersonController(inputs, playerRigidbody, playerSkin, camera, movementDamping, bodyID, onPlanet, walkableLayers, maxSpeed);
         cam = new ThirdPersonCamera(camera, offset, cameraCollisionLayers, playerLayer, movementDamping, cameraCollisionDistance, clamp);
         jump = new CharacterJumping(playerRigidbody, jumpPower, swimUpPower, jumpCooldown, swimUpCooldown, jumpableLayers, bodyID);
         crouch = new CharacterCrouching(playerRigidbody, divePower, diveCooldown, bodyID);
         grappling = gameObject.AddComponent<CharacterGrappling>();
-        grappling.Construct(camera, playerRigidbody, grappelRange, grappelStrength, grappelableLayers, grappelMachineTransform, grappleHookTransform, grappleBreakDistance, bodyID);
+        grappling.Construct(camera, playerRigidbody, grappelRange, grappelStrength, grappelableLayers, grappelMachineTransform, grappleHookTransform, playerSkin, bodyID);
     }
     // ============================================================================================//
     private void FixedUpdate()
@@ -122,8 +123,17 @@ public class Movement : MonoBehaviour
     }
     private void Update()
     {
+        inventoryClosed = Cursor.lockState == CursorLockMode.Locked;
+
         // GRAPPELING
         isUsingGrapple = grappling.UpdateState(inventoryClosed && inputs.Player.Grapple.triggered);
+
+        if (inventoryClosed && !isUsingGrapple)
+        {
+            // UPDATE JUMP AND CROUCH STATUS
+            jump.Update(inputs.Player.Jump.ReadValue<float>());
+            crouch.Update(inputs.Player.Crouch.ReadValue<float>());
+        }
     }
     // ============================================================================================//
     private void GetInput()
@@ -140,17 +150,11 @@ public class Movement : MonoBehaviour
     // ============================================================================================//
     private void SendInput()
     {
-        inventoryClosed = Cursor.lockState == CursorLockMode.Locked;
-
         if (inventoryClosed && !isUsingGrapple)
         {
             // UPDATE AND MOVE PLAYER
             player.UpdateInput(moveInput, lookInput, lookInputDir);
             player.Move();
-
-            // UPDATE JUMP AND CROUCH STATUS
-            jump.Update(inputs.Player.Jump.ReadValue<float>());
-            crouch.Update(inputs.Player.Crouch.ReadValue<float>());
         }
 
         // UPDATE AND MOVE CAMERA

@@ -7950,6 +7950,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
+      propertyPath: maxSpeed
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
       propertyPath: offset.x
       value: 0.7
       objectReference: {fileID: 0}
@@ -7962,8 +7966,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
+      propertyPath: jumpPower
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
       propertyPath: moveSpeed
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
       propertyPath: useGravity
@@ -7971,11 +7979,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
       propertyPath: grappelRange
-      value: 100
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
       propertyPath: grappelStrength
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
+      propertyPath: movementDamping
+      value: 0.582
+      objectReference: {fileID: 0}
+    - target: {fileID: 1065532218926289900, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: c8581e221ea7b314bbc2394367f11371, type: 2}
+    - target: {fileID: 1065532218926289901, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
+      propertyPath: m_Drag
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1065532218926289902, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
       propertyPath: m_RootOrder

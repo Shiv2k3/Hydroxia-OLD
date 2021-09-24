@@ -119,8 +119,6 @@ public class Body
         centerOfMassInWorld = rb.position + (rb.rotation * massCenter);
         downRay.origin = centerOfMassInWorld;
         downRay.direction = -centerOfMassInWorld.normalized;
-
-        Debug.DrawRay(downRay.origin, downRay.direction * 10, Color.green);
     }
     private int lastFrameChecked;
     private bool lastCheckState;

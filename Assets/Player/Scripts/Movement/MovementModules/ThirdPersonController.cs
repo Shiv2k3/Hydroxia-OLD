@@ -10,6 +10,7 @@ public class ThirdPersonController
     private readonly bool _applyPlanetRotation;
     private readonly float _damping;
     private readonly int _myPlanetID;
+    private readonly float _maxSpeed;
     // ============================================================================================//
     private LayerMask _walkableLayers;
     private Quaternion _rotation;
@@ -19,13 +20,13 @@ public class ThirdPersonController
     private Vector2 _lookInput;
     private Vector2 _lookInputDir;
     // ============================================================================================//
-    public ThirdPersonController(PlayerMovement inputActions, Rigidbody rb, Transform playerSkin, Camera camera, float damping, int myID, bool applyPlanetRotation, LayerMask walkableLayers)
+    public ThirdPersonController(PlayerMovement inputActions, Rigidbody rb, Transform playerSkin, Camera camera, float damping, int myID, bool applyPlanetRotation, LayerMask walkableLayers, float maxSpeed)
     {
         _rb = rb;
         _rotation = rb.rotation;
         _camera = camera.transform;
         _walkableLayers = walkableLayers;
-
+        _maxSpeed = maxSpeed;
         _damping = damping;
         _myPlanetID = myID;
         _applyPlanetRotation = applyPlanetRotation;
@@ -39,7 +40,7 @@ public class ThirdPersonController
     {
         Rotate();
         GetDirection();
-        Move(_forward, _right);
+        ApplyMove();
     }
     // ============================================================================================//
     void Rotate()
@@ -64,14 +65,15 @@ public class ThirdPersonController
             _rotation = Quaternion.FromToRotation(_rotation * Vector3.up, _rb.position.normalized) * Quaternion.AngleAxis(_lookInput.x, _rotation * Vector3.up) * _rotation;
     }
     // ============================================================================================//
-    private void Move(Vector3 forward, Vector3 right)
+    private void ApplyMove()
     {
         Vector3 up = _rotation * Vector3.up;
         Vector3 direction = _forward + _right;
 
         Ray ray = new Ray(_rb.position + up / 1.5f, direction);
-        if (!Physics.Raycast(ray, out RaycastHit hit, 1.1f, _walkableLayers))
+        if (_rb.velocity.magnitude < _maxSpeed && !Physics.Raycast(ray, 1.1f, _walkableLayers))
             _rb.MovePosition(_rb.position + direction);
+
 
         if (_applyPlanetRotation) _rotation = Quaternion.FromToRotation(_rb.rotation * Vector3.up, _rb.position.normalized) * _rotation;
         _rb.MoveRotation(_moveInput == Vector2.zero ? _rb.rotation : _rotation);
