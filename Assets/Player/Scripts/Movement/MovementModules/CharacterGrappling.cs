@@ -86,7 +86,7 @@ public class CharacterGrappling : MonoBehaviour
 
         for (float i = 0; i < steps; i++)
         {
-            _rb.position = Vector3.Lerp(start, moveTo, (i + 1) / steps);
+            _rb.MovePosition(Vector3.Lerp(start, moveTo, (i + 1) / steps));
             yield return null;
         }
 
@@ -101,6 +101,7 @@ public class CharacterGrappling : MonoBehaviour
         _throwingGrapple = false;
 
         BodyManager.Instance.ToggleUseGravity(_bodyID, true);
+        _rb.AddForce(_rb.velocity * _grappleStrength,ForceMode.VelocityChange); // HOW TO MAKE IT HAVE A GOOD FORCE
         _rb.isKinematic = false;
 
         int steps = (int)(Vector3.Distance(_hookT.position, _grappleT.position) / _grappleStrength);
@@ -116,6 +117,7 @@ public class CharacterGrappling : MonoBehaviour
         _hookT.localPosition = Vector3.zero;
         _hookT.localRotation = Quaternion.identity;
         _retractingGrapple = false;
+
     }
 
     public void Construct(Camera camera, Rigidbody playerRigidbody, float grappelRange, float grappelStrength, LayerMask grappelableLayers, Transform grappelT, Transform hookT, float grappleBreakDistance, int bodyID)
