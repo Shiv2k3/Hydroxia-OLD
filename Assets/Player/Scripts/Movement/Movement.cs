@@ -77,6 +77,13 @@ public class Movement : MonoBehaviour
     [SerializeField] private float grappleBreakDistance = 1;
     [HideInInspector] private bool isUsingGrapple;
     // ============================================================================================//
+    [FoldoutGroup("Flying Settings")]
+    [SerializeField] private float flyingCooldown = 0.7f;
+    [FoldoutGroup("Flying Settings")]
+    [SerializeField] private float flySpeed = 8;
+    [FoldoutGroup("Flying Settings")]
+    [SerializeField] private float flyMaxSpeed = 10;
+    // ============================================================================================//
     [Header("Planet")]
     private BodyManager bodyManager;
     private int bodyID;
@@ -87,6 +94,7 @@ public class Movement : MonoBehaviour
     private CharacterJumping jump;
     private CharacterCrouching crouch;
     private CharacterGrappling grappling;
+    private CharacterFlying flying;
     // ============================================================================================//
     [Header("Input Variables")]
     private Vector2 moveInput;
@@ -109,6 +117,7 @@ public class Movement : MonoBehaviour
         cam = new ThirdPersonCamera(camera, offset, cameraCollisionLayers, playerLayer, movementDamping, cameraCollisionDistance, clamp);
         jump = new CharacterJumping(playerRigidbody, jumpPower, swimUpPower, jumpCooldown, swimUpCooldown, jumpableLayers, bodyID);
         crouch = new CharacterCrouching(playerRigidbody, divePower, diveCooldown, bodyID);
+        flying = new CharacterFlying(flySpeed, flyMaxSpeed, playerRigidbody, flyingCooldown);
         grappling = gameObject.AddComponent<CharacterGrappling>();
         grappling.Construct(camera, playerRigidbody, grappelRange, grappelStrength, grappelableLayers, grappelMachineTransform, grappleHookTransform, playerSkin, bodyID);
     }
@@ -120,6 +129,12 @@ public class Movement : MonoBehaviour
 
         // SAVE DATA AND EXECUTE MOVEMENT
         SendInput();
+
+        // MAX SPEED
+        if (playerRigidbody.velocity.magnitude > maxSpeed)
+        {
+            playerRigidbody.velocity = playerRigidbody.velocity.normalized * maxSpeed;
+        }
     }
     private void Update()
     {
@@ -155,6 +170,8 @@ public class Movement : MonoBehaviour
             // UPDATE AND MOVE PLAYER
             player.UpdateInput(moveInput, lookInput, lookInputDir);
             player.Move();
+
+            flying.Update(inputs.Player.Fly.ReadValue<float>(), onPlanet);
         }
 
         // UPDATE AND MOVE CAMERA

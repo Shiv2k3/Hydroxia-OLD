@@ -1,4 +1,4 @@
-// GENERATED AUTOMATICALLY FROM 'Assets/Prefabs/Player/Action Maps/PlayerInteraction.inputactions'
+// GENERATED AUTOMATICALLY FROM 'Assets/Player/Action Maps/PlayerInteraction.inputactions'
 
 using System;
 using System.Collections;

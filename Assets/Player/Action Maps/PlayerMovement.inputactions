@@ -44,6 +44,14 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "Fly",
+                    "type": "Button",
+                    "id": "d0d2afa2-a8a5-435a-be33-7dafeab7ddaa",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -143,6 +151,17 @@
                     "processors": "",
                     "groups": "PC",
                     "action": "Grapple",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d6c8e414-8013-487e-8e9d-88ce856f34c9",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "PC",
+                    "action": "Fly",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

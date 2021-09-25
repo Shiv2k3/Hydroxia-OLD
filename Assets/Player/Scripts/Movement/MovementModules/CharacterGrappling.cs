@@ -89,7 +89,6 @@ public class CharacterGrappling : MonoBehaviour
 
         for (float i = 0; i < steps; i++)
         {
-            _skin.LookAt(_hookT);
             _rb.MovePosition(Vector3.Lerp(start, moveTo, (i + 1) / steps));
             yield return fixedUpdate;
         }

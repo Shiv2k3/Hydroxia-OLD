@@ -1,4 +1,4 @@
-// GENERATED AUTOMATICALLY FROM 'Assets/Prefabs/Player/Action Maps/PlayerMovement.inputactions'
+// GENERATED AUTOMATICALLY FROM 'Assets/Player/Action Maps/PlayerMovement.inputactions'
 
 using System;
 using System.Collections;
@@ -54,6 +54,14 @@ public class @PlayerMovement : IInputActionCollection, IDisposable
                     ""name"": ""Grapple"",
                     ""type"": ""Button"",
                     ""id"": ""f363d090-f768-4c58-9eeb-3fb4e1555157"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Fly"",
+                    ""type"": ""Button"",
+                    ""id"": ""d0d2afa2-a8a5-435a-be33-7dafeab7ddaa"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -158,6 +166,17 @@ public class @PlayerMovement : IInputActionCollection, IDisposable
                     ""action"": ""Grapple"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d6c8e414-8013-487e-8e9d-88ce856f34c9"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""PC"",
+                    ""action"": ""Fly"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -188,6 +207,7 @@ public class @PlayerMovement : IInputActionCollection, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
         m_Player_Grapple = m_Player.FindAction("Grapple", throwIfNotFound: true);
+        m_Player_Fly = m_Player.FindAction("Fly", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -242,6 +262,7 @@ public class @PlayerMovement : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Crouch;
     private readonly InputAction m_Player_Grapple;
+    private readonly InputAction m_Player_Fly;
     public struct PlayerActions
     {
         private @PlayerMovement m_Wrapper;
@@ -251,6 +272,7 @@ public class @PlayerMovement : IInputActionCollection, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
         public InputAction @Grapple => m_Wrapper.m_Player_Grapple;
+        public InputAction @Fly => m_Wrapper.m_Player_Fly;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -275,6 +297,9 @@ public class @PlayerMovement : IInputActionCollection, IDisposable
                 @Grapple.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGrapple;
                 @Grapple.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGrapple;
                 @Grapple.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGrapple;
+                @Fly.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFly;
+                @Fly.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFly;
+                @Fly.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFly;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -294,6 +319,9 @@ public class @PlayerMovement : IInputActionCollection, IDisposable
                 @Grapple.started += instance.OnGrapple;
                 @Grapple.performed += instance.OnGrapple;
                 @Grapple.canceled += instance.OnGrapple;
+                @Fly.started += instance.OnFly;
+                @Fly.performed += instance.OnFly;
+                @Fly.canceled += instance.OnFly;
             }
         }
     }
@@ -314,5 +342,6 @@ public class @PlayerMovement : IInputActionCollection, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnCrouch(InputAction.CallbackContext context);
         void OnGrapple(InputAction.CallbackContext context);
+        void OnFly(InputAction.CallbackContext context);
     }
 }
