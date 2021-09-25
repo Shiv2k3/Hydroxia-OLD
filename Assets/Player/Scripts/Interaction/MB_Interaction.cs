@@ -48,6 +48,11 @@ public class MB_Interaction : MonoBehaviour
     [HideInInspector] private RaycastHit playerRayHit;
     [HideInInspector] public int selectionIndex = 0;
 
+    private void Start()
+    {
+        interactCard = new InteractionCard(GetComponent<MB_Movement>());
+    }
+
     private void Update()
     {
         HotbarSelection();
@@ -66,11 +71,11 @@ public class MB_Interaction : MonoBehaviour
                     playerRay.origin = raycastPoint.position;
                     playerRay.direction = (camRayHit.point - raycastPoint.position).normalized;
                     Physics.Raycast(playerRay, out playerRayHit, range, buildableLayer);
-                    buildCard.objectHit = playerRayHit.transform?.gameObject;
+                    buildCard.buildable = playerRayHit.transform?.gameObject;
                 }
                 else
                 {
-                    buildCard.objectHit = null;
+                    buildCard.buildable = null;
                     return;
                 }
 
@@ -86,11 +91,11 @@ public class MB_Interaction : MonoBehaviour
                     playerRay.origin = raycastPoint.position;
                     playerRay.direction = (camRayHit.point - raycastPoint.position).normalized;
                     Physics.Raycast(playerRay, out playerRayHit, range, attackLayer);
-                    attackCard.objectHit = playerRayHit.transform?.gameObject;
+                    attackCard.attackable = playerRayHit.transform?.gameObject;
                 }
                 else
                 {
-                    attackCard.objectHit = null;
+                    attackCard.attackable = null;
                     return;
                 }
 
@@ -106,11 +111,11 @@ public class MB_Interaction : MonoBehaviour
                     playerRay.origin = raycastPoint.position;
                     playerRay.direction = (camRayHit.point - raycastPoint.position).normalized;
                     Physics.Raycast(playerRay, out playerRayHit, range, interactLayer);
-                    interactCard.objectHit = playerRayHit.transform?.gameObject;
+                    interactCard.interactable = playerRayHit.transform?.gameObject;
                 }
                 else
                 {
-                    interactCard.objectHit = null;
+                    interactCard.interactable = null;
                     return;
                 }
 
@@ -122,9 +127,9 @@ public class MB_Interaction : MonoBehaviour
     }
     private void PerformBuild()
     {
-        if (buildCard.objectHit)
+        if (buildCard.buildable)
         {
-            Debug.Log("Building " + buildCard.placeableHeld.name + " on " + buildCard.objectHit.name);
+            Debug.Log("Building " + buildCard.placeableHeld.name + " on " + buildCard.buildable.name);
         }
     }
     private void PerformAttack()
@@ -140,15 +145,22 @@ public class MB_Interaction : MonoBehaviour
     }
     private void PerformInteract()
     {
-        MB_DroppedItem droppedItem = interactCard.objectHit?.GetComponent<MB_DroppedItem>();
+        MB_DroppedItem droppedItem = interactCard.interactable?.GetComponent<MB_DroppedItem>();
         if (droppedItem)
         {
             inventory.AddDroppedItemToInventory(droppedItem);
+            return;
         }
-        else
+
+        AB_MB_Mount mount = interactCard.interactable?.GetComponent<AB_MB_Mount>();
+        if (mount)
         {
-            Debug.Log("Can't interact with this object, maybe the requipred script is on the wrong parent?");
+            mount.ToggleMount(interactCard);
+            return;
         }
+
+
+        Debug.Log("Can't interact with this object, maybe the requipred script is on the wrong parent?");
     }
     private void HotbarSelection()
     {
@@ -211,23 +223,23 @@ public class MB_Interaction : MonoBehaviour
 public class AttackCard : EventArgs
 {
     public int Damage => weaponEquiped ? weaponEquiped.damage : 0;
-    [ShowIf("@weaponEquiped != null")] public SO_Item_Tool weaponEquiped;
-    [ShowIf("@objectHit != null")] public GameObject objectHit;
+    [ReadOnly] public SO_Item_Tool weaponEquiped;
+    [ReadOnly] public GameObject attackable;
 }
 [Serializable]
 public class BuildCard : EventArgs
 {
-    [ShowIf("@placeableHeld != null")] public SO_Item_Placeable placeableHeld;
-    [ShowIf("@objectHit != null")] public GameObject objectHit;
+    [ReadOnly] public SO_Item_Placeable placeableHeld;
+    [ReadOnly] public GameObject buildable;
 }
 [Serializable]
 public class InteractionCard : EventArgs
 {
-    public object inventory;
-    [ShowIf("@objectHit != null")] public GameObject objectHit;
+    [HideInInspector] public MB_Movement playerMovement;
+    [ReadOnly] public GameObject interactable;
 
-    public InteractionCard(object inventory)
+    public InteractionCard(MB_Movement playerMovement)
     {
-        this.inventory = inventory;
+        this.playerMovement = playerMovement;
     }
 }

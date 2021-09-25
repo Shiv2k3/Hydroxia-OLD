@@ -38,13 +38,13 @@ public class TileManager : MonoBehaviour
     MB_DroppableItem dropable;
     private void MB_Interaction_OnAttack(object sender, AttackCard attackCard)
     {
-        dropable = attackCard.objectHit?.GetComponentInParent<MB_DroppableItem>();
+        dropable = attackCard.attackable?.GetComponentInParent<MB_DroppableItem>();
         if (dropable)
         {
             dropable.Attacked(attackCard);
         }
         else
-            Debug.Log("You can't damage " + attackCard.objectHit?.name + ", make sure the script MB_Dropable is attached to the parent of the collider you are hitting");
+            Debug.Log("You can't damage " + attackCard.attackable?.name + ", make sure the script MB_Dropable is attached to the parent of the collider you are hitting");
     }
 
     public static IEnumerator DropTileCoroutine(MB_DroppableItem item)

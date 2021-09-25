@@ -1,7 +1,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
-public class Movement : MonoBehaviour
+public class MB_Movement : MonoBehaviour
 {
     #region // PRAMETERS
     // ============================================================================================//
@@ -16,6 +16,8 @@ public class Movement : MonoBehaviour
     // ============================================================================================//
     [FoldoutGroup("Settings")]
     [SerializeField] private bool hideCursor = true;
+    [FoldoutGroup("Settings")]
+    [ReadOnly, SerializeField] private bool mounted = false;
     [FoldoutGroup("Settings")]
     [SerializeField] private LayerMask playerLayer;
     [FoldoutGroup("Settings")]
@@ -131,7 +133,7 @@ public class Movement : MonoBehaviour
         SendInput();
 
         // MAX SPEED
-        if (playerRigidbody.velocity.magnitude > maxSpeed)
+        if (!mounted && playerRigidbody.velocity.magnitude > maxSpeed)
         {
             playerRigidbody.velocity = playerRigidbody.velocity.normalized * maxSpeed;
         }
@@ -141,9 +143,9 @@ public class Movement : MonoBehaviour
         inventoryClosed = Cursor.lockState == CursorLockMode.Locked;
 
         // GRAPPELING
-        isUsingGrapple = grappling.UpdateState(inventoryClosed && inputs.Player.Grapple.triggered);
+        if (!mounted) isUsingGrapple = grappling.UpdateState(inventoryClosed && inputs.Player.Grapple.triggered);
 
-        if (inventoryClosed && !isUsingGrapple)
+        if (inventoryClosed && !isUsingGrapple && !mounted)
         {
             // UPDATE JUMP AND CROUCH STATUS
             jump.Update(inputs.Player.Jump.ReadValue<float>());
@@ -165,7 +167,7 @@ public class Movement : MonoBehaviour
     // ============================================================================================//
     private void SendInput()
     {
-        if (inventoryClosed && !isUsingGrapple)
+        if (!mounted && inventoryClosed && !isUsingGrapple)
         {
             // UPDATE AND MOVE PLAYER
             player.UpdateInput(moveInput, lookInput, lookInputDir);
@@ -180,6 +182,7 @@ public class Movement : MonoBehaviour
     }
     // ============================================================================================//
     public void ToggleMovement(bool setActive) => canMove = setActive;
+    public void ToggleMounted(bool setActive) => mounted = setActive;
     // ============================================================================================//
     private void Awake()
     {
