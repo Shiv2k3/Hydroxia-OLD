@@ -23,6 +23,7 @@ public class CharacterGrappling : MonoBehaviour
     public bool _retractingGrapple;
     public bool _movingToGrapple;
     public bool _grappled;
+    public Vector2 _grappleClamp;
     Ray _cameraRay;
 
     Coroutine throwGrapple;
@@ -33,7 +34,7 @@ public class CharacterGrappling : MonoBehaviour
     {
         if (grappelInput)
         {
-           if(mount)
+            if (mount)
             {
                 mount.Grapple();
                 return false;
@@ -50,7 +51,9 @@ public class CharacterGrappling : MonoBehaviour
             {
                 _cameraRay = _camera.ScreenPointToRay(Input.mousePosition);
                 Vector3 grappleTo = _camera.transform.position + (_cameraRay.direction * _grappleRange);
-                throwGrapple = StartCoroutine(ThrowGrapple(grappleTo));
+                float angleToGraplle = Vector3.Angle(grappleTo, _cameraRay.direction) - 90;
+                if (angleToGraplle < _grappleClamp.y && angleToGraplle > _grappleClamp.x)
+                    throwGrapple = StartCoroutine(ThrowGrapple(grappleTo));
             }
         }
 
@@ -128,7 +131,7 @@ public class CharacterGrappling : MonoBehaviour
         _retractingGrapple = false;
 
     }
-    public void Construct(Camera camera, Rigidbody playerRigidbody, float grappelRange, float grappelStrength, LayerMask grappelableLayers, Transform grappelT, Transform hookT, Transform skin, int bodyID)
+    public void Construct(Camera camera, Rigidbody playerRigidbody, float grappelRange, float grappelStrength, LayerMask grappelableLayers, Transform grappelT, Transform hookT, Transform skin, int bodyID, Vector2 grappleClamp)
     {
         _camera = camera;
         _rb = playerRigidbody;
@@ -139,5 +142,6 @@ public class CharacterGrappling : MonoBehaviour
         _grappleT = grappelT;
         _hookT = hookT;
         _bodyID = bodyID;
+        _grappleClamp = grappleClamp;
     }
 }

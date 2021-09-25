@@ -43,7 +43,7 @@ public class MB_Movement : MonoBehaviour
     [FoldoutGroup("Camera Settings")]
     [SerializeField] private Vector3 offset;
     [FoldoutGroup("Camera Settings")]
-    [SerializeField] private Vector2 clamp;
+    [SerializeField, MinMaxSlider(-180f,180f, true)] private Vector2 clamp;
     // ============================================================================================//
     [FoldoutGroup("Jump Settings")]
     [SerializeField] private LayerMask jumpableLayers;
@@ -71,6 +71,8 @@ public class MB_Movement : MonoBehaviour
     [SerializeField] private float grappelStrength = 10;
     [FoldoutGroup("Grappel Settings")]
     [SerializeField] private float grappelRange = 25;
+    [FoldoutGroup("Grappel Settings")]
+    [SerializeField, MinMaxSlider("@clamp",true)] Vector2 grappleClamp = new Vector2(-40,40);
     [HideInInspector] private bool isUsingGrapple;
     // ============================================================================================//
     [FoldoutGroup("Flying Settings")]
@@ -123,7 +125,7 @@ public class MB_Movement : MonoBehaviour
         crouch = new CharacterCrouching(playerRigidbody, divePower, diveCooldown, bodyID);
         flying = new CharacterFlying(flySpeed, flyMaxSpeed, playerRigidbody, flyingCooldown);
         grappling = gameObject.AddComponent<CharacterGrappling>();
-        grappling.Construct(camera, playerRigidbody, grappelRange, grappelStrength, grappelableLayers, grappelMachineTransform, grappleHookTransform, playerSkin, bodyID);
+        grappling.Construct(camera, playerRigidbody, grappelRange, grappelStrength, grappelableLayers, grappelMachineTransform, grappleHookTransform, playerSkin, bodyID, grappleClamp);
     }
     private void FixedUpdate()
     {
@@ -156,7 +158,7 @@ public class MB_Movement : MonoBehaviour
         inventoryClosed = Cursor.lockState == CursorLockMode.Locked;
 
         // GRAPPELING
-        isUsingGrapple = grappling.UpdateState(mount, inventoryClosed && inputs.Player.Grapple.triggered);
+        isUsingGrapple = grappling.UpdateState(inventoryClosed && inputs.Player.Grapple.triggered, mount);
 
         if (inventoryClosed && !isUsingGrapple)
         {
