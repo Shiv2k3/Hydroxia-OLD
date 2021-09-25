@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class MB_Movement : MonoBehaviour
 {
-    #region // PRAMETERS
+    #region PRAMETERS
     // ============================================================================================//
     [FoldoutGroup("References")]
     [SerializeField] private PlayerMovement inputs;
@@ -16,8 +16,6 @@ public class MB_Movement : MonoBehaviour
     // ============================================================================================//
     [FoldoutGroup("Settings")]
     [SerializeField] private bool hideCursor = true;
-    [FoldoutGroup("Settings")]
-    [ReadOnly, SerializeField] private bool mounted = false;
     [FoldoutGroup("Settings")]
     [SerializeField] private LayerMask playerLayer;
     [FoldoutGroup("Settings")]
@@ -55,8 +53,6 @@ public class MB_Movement : MonoBehaviour
     [SerializeField] private float jumpCooldown = 0.70f;
     // ============================================================================================//
     [FoldoutGroup("Swim Settings")]
-    [SerializeField, Range(0, 1), Tooltip("Use a small decimal values for better results")] private float waterCollisionDamping = 0.05f;
-    [FoldoutGroup("Swim Settings")]
     [SerializeField] private float swimUpPower = 5;
     [FoldoutGroup("Swim Settings")]
     [SerializeField] private float swimUpCooldown = .2f;
@@ -75,8 +71,6 @@ public class MB_Movement : MonoBehaviour
     [SerializeField] private float grappelStrength = 10;
     [FoldoutGroup("Grappel Settings")]
     [SerializeField] private float grappelRange = 25;
-    [FoldoutGroup("Grappel Settings")]
-    [SerializeField] private float grappleBreakDistance = 1;
     [HideInInspector] private bool isUsingGrapple;
     // ============================================================================================//
     [FoldoutGroup("Flying Settings")]
@@ -86,8 +80,10 @@ public class MB_Movement : MonoBehaviour
     [FoldoutGroup("Flying Settings")]
     [SerializeField] private float flyMaxSpeed = 10;
     // ============================================================================================//
+    [FoldoutGroup("Mount Setting")]
+    [SerializeField, ReadOnly] private AB_MB_Mount mount;
+    // ============================================================================================//
     [Header("Planet")]
-    private BodyManager bodyManager;
     private int bodyID;
     // ============================================================================================//
     [Header("Scripts")]
@@ -104,15 +100,21 @@ public class MB_Movement : MonoBehaviour
     private Vector2 lookInputDir;
     // ============================================================================================//
     #endregion
-    // ============================================================================================//
+    #region MB
+    private void Awake()
+    {
+        // INPUT
+        if (hideCursor) Cursor.lockState = CursorLockMode.Locked;
+        inputs = new PlayerMovement();
+        inputs.Enable();
+    }
     private void Start()
     {
         // GRAVITY
         if (transform.GetChild(0).localPosition.y != 1) Debug.Log("Y of mesh is not set to 1, if it no longer needs this value change value on the script called BodyHelper.cs    ");
-        bodyManager = BodyManager.Instance;
-        bodyID = bodyManager.AddNewBody(GetComponent<Rigidbody>(), waterCollisionDamping);
-        bodyManager.ToggleUseGravity(bodyID, useGravity);
-        bodyManager.ToggleOnPlanet(bodyID, onPlanet);
+        bodyID = BodyManager.Instance.AddNewBody(GetComponent<Rigidbody>());
+        BodyManager.Instance.ToggleUseGravity(bodyID, useGravity);
+        onPlanet = BodyManager.Instance.GetOnPlanet();
 
         //  MOVEMENT CLASSES INITIALIZATION
         player = new ThirdPersonController(inputs, playerRigidbody, playerSkin, camera, movementDamping, bodyID, onPlanet, walkableLayers, maxSpeed);
@@ -123,36 +125,52 @@ public class MB_Movement : MonoBehaviour
         grappling = gameObject.AddComponent<CharacterGrappling>();
         grappling.Construct(camera, playerRigidbody, grappelRange, grappelStrength, grappelableLayers, grappelMachineTransform, grappleHookTransform, playerSkin, bodyID);
     }
-    // ============================================================================================//
     private void FixedUpdate()
     {
         // GET AND PROCESS INPUT
         GetInput();
 
-        // SAVE DATA AND EXECUTE MOVEMENT
-        SendInput();
+        #region EXEC MOVEMENT
+        if (inventoryClosed && !isUsingGrapple)
+        {
+            // UPDATE AND MOVE PLAYER
+            player.UpdateInput(moveInput, lookInput, lookInputDir);
+            player.Move(mount);
+
+            flying.Update(mount, inputs.Player.Fly.ReadValue<float>(), onPlanet);
+        }
+
+        // UPDATE AND MOVE CAMERA
+        cam.UpdateInput(lookInput, lookInputDir, playerRigidbody.position);
+        cam.Move(mount);
 
         // MAX SPEED
-        if (!mounted && playerRigidbody.velocity.magnitude > maxSpeed)
+        if (playerRigidbody.velocity.magnitude > maxSpeed)
         {
             playerRigidbody.velocity = playerRigidbody.velocity.normalized * maxSpeed;
         }
+        #endregion
     }
     private void Update()
     {
         inventoryClosed = Cursor.lockState == CursorLockMode.Locked;
 
         // GRAPPELING
-        if (!mounted) isUsingGrapple = grappling.UpdateState(inventoryClosed && inputs.Player.Grapple.triggered);
+        isUsingGrapple = grappling.UpdateState(mount, inventoryClosed && inputs.Player.Grapple.triggered);
 
-        if (inventoryClosed && !isUsingGrapple && !mounted)
+        if (inventoryClosed && !isUsingGrapple)
         {
             // UPDATE JUMP AND CROUCH STATUS
-            jump.Update(inputs.Player.Jump.ReadValue<float>());
-            crouch.Update(inputs.Player.Crouch.ReadValue<float>());
+            jump.Update(mount, inputs.Player.Jump.ReadValue<float>());
+            crouch.Update(mount, inputs.Player.Crouch.ReadValue<float>());
         }
     }
-    // ============================================================================================//
+    private void OnDisable()
+    {
+        inputs.Disable();
+    }
+    #endregion
+    #region METHODS
     private void GetInput()
     {
         // GET INPUT
@@ -164,36 +182,10 @@ public class MB_Movement : MonoBehaviour
         if (moveInput != Vector2.zero && canMove) lookInputDir.x = Mathf.Lerp(lookInputDir.x, 0, movementDamping); // ZERO Y ROTATION IF MOVING
         lookInputDir.y = Mathf.Clamp(lookInputDir.y, clamp.x, clamp.y); // CLAMP X ROTATION
     }
-    // ============================================================================================//
-    private void SendInput()
-    {
-        if (!mounted && inventoryClosed && !isUsingGrapple)
-        {
-            // UPDATE AND MOVE PLAYER
-            player.UpdateInput(moveInput, lookInput, lookInputDir);
-            player.Move();
-
-            flying.Update(inputs.Player.Fly.ReadValue<float>(), onPlanet);
-        }
-
-        // UPDATE AND MOVE CAMERA
-        cam.UpdateInput(lookInput, lookInputDir, playerRigidbody.position);
-        cam.Move();
-    }
-    // ============================================================================================//
     public void ToggleMovement(bool setActive) => canMove = setActive;
-    public void ToggleMounted(bool setActive) => mounted = setActive;
-    // ============================================================================================//
-    private void Awake()
+    public void ToggleMounted(AB_MB_Mount mount)
     {
-        // INPUT
-        if (hideCursor) Cursor.lockState = CursorLockMode.Locked;
-        inputs = new PlayerMovement();
-        inputs.Enable();
+        this.mount = mount;
     }
-    private void OnDisable()
-    {
-        inputs.Disable();
-    }
-    // ============================================================================================//
+    #endregion
 }

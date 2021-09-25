@@ -28,7 +28,7 @@ public class ThirdPersonCamera
         _collisionDistance = collisionDistance;
     }
 
-    public void Move()
+    public void Move(AB_MB_Mount mount)
     {
         MoveToRotation();
     }

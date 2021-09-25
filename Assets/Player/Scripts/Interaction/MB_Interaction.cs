@@ -40,6 +40,7 @@ public class MB_Interaction : MonoBehaviour
     // REFERENCES
     [HideInInspector] private PlayerInteraction actions;
     [HideInInspector] public event EventHandler<AttackCard> OnAttack;
+    [HideInInspector] private MB_Movement playerMovement;
 
     // RAY CAST
     [HideInInspector] private Ray camRay;
@@ -50,7 +51,8 @@ public class MB_Interaction : MonoBehaviour
 
     private void Start()
     {
-        interactCard = new InteractionCard(GetComponent<MB_Movement>());
+        playerMovement = GetComponent<MB_Movement>();
+        interactCard = new InteractionCard(playerMovement);
     }
 
     private void Update()
@@ -155,7 +157,7 @@ public class MB_Interaction : MonoBehaviour
         AB_MB_Mount mount = interactCard.interactable?.GetComponent<AB_MB_Mount>();
         if (mount)
         {
-            mount.ToggleMount(interactCard);
+            mount.OnMount(interactCard);
             return;
         }
 

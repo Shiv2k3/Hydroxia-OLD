@@ -2,7 +2,7 @@
 
 public class BodyHelper
 {
-    public static bool IsBodyUnderWater(int id) { return !BodyManager.IsBodyUnderWater(id); }
+    public static bool IsBodyUnderWater(int id) { return !BodyManager.Instance.IsBodyUnderWater(id); }
 
     public static float DistFromOceanSurface(Rigidbody _rb, LayerMask _waterLayer)
     {

@@ -23,7 +23,7 @@ public class CharacterCrouching
         _rb.AddForce(_rb.position.normalized * -_divePower * Time.fixedDeltaTime, ForceMode.Impulse);
     }
 
-    public void Update(float value)
+    public void Update(AB_MB_Mount mount, float value)
     {
         if (value != 0)
         {

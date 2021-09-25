@@ -37,7 +37,7 @@ public class AssetCreator : OdinMenuEditorWindow
     private class CreateItem
     {
         #region PARAMETERS
-        private bool objectMenuActive;
+        private bool objectMenuActive = false;
         [HorizontalGroup("top"), VerticalGroup("top/left"), PreviewField(Alignment = ObjectFieldAlignment.Left, Height = 90), InlineEditor(DrawGUI = false, DrawPreview = true, ObjectFieldMode = InlineEditorObjectFieldModes.CompletelyHidden)]
         [ShowIf("@objectMenuActive == true"), SerializeField]
         private Sprite sprite;

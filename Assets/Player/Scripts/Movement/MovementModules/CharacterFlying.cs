@@ -8,7 +8,7 @@ public class CharacterFlying
     private float _cooldown;
     private float _lastFlapped;
     private Vector3 lastPos;
-    public void Update(float input, bool planet)
+    public void Update(AB_MB_Mount mount, float input, bool planet)
     {
         if (input == 1)
         {

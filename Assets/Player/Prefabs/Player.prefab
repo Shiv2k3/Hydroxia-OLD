@@ -705,7 +705,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &627710401
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1858,20 +1858,21 @@ MonoBehaviour:
   walkableLayers:
     serializedVersion: 2
     m_Bits: 520
-  applyPlanetRotation: 0
-  moveSpeed: 18
+  onPlanet: 0
+  useGravity: 1
+  moveSpeed: 7
+  maxSpeed: 15
   cameraCollisionLayers:
     serializedVersion: 2
     m_Bits: 520
   cameraCollisionDistance: 0.8
-  offset: {x: 0, y: 2, z: -7}
+  offset: {x: 0.4, y: 2.3, z: -7}
   clamp: {x: -80, y: 80}
   jumpableLayers:
     serializedVersion: 2
     m_Bits: 520
   jumpPower: 7
   jumpCooldown: 0.7
-  waterCollisionDamping: 0.05
   swimUpPower: 5
   swimUpCooldown: 0.2
   divePower: 5
@@ -1881,9 +1882,12 @@ MonoBehaviour:
     m_Bits: 520
   grappelMachineTransform: {fileID: 6534640338278895791}
   grappleHookTransform: {fileID: 7709800239734683662}
-  grappelStrength: 3
-  grappelRange: 45
-  grappleBreakDistance: 1
+  grappelStrength: 1
+  grappelRange: 50
+  flyingCooldown: 0.7
+  flySpeed: 8
+  flyMaxSpeed: 5
+  mount: {fileID: 0}
 --- !u!114 &1065532218926289899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1901,21 +1905,22 @@ MonoBehaviour:
   range: 5
   attackCard:
     weaponEquiped: {fileID: 0}
-    objectHit: {fileID: 0}
+    attackable: {fileID: 0}
   attackCooldown: 0.05
   attackLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 4608
   inventory: {fileID: 1065532218926289898}
   interactCard:
-    objectHit: {fileID: 0}
+    playerMovement: {fileID: 0}
+    interactable: {fileID: 0}
   interactCooldown: 0.05
   interactLayer:
     serializedVersion: 2
-    m_Bits: 2304
+    m_Bits: 6400
   buildCard:
     placeableHeld: {fileID: 0}
-    objectHit: {fileID: 0}
+    buildable: {fileID: 0}
   buildingCooldown: 0.5
   buildableLayer:
     serializedVersion: 2
@@ -2530,7 +2535,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6770315398160537682
 RectTransform:
   m_ObjectHideFlags: 0

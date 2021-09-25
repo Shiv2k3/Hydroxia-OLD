@@ -36,8 +36,13 @@ public class ThirdPersonController
         _inputs = inputActions;
     }
     // ============================================================================================//
-    public void Move()
+    public void Move(AB_MB_Mount mount)
     {
+        if (mount)
+        {
+            mount.Move();
+            return;
+        }
         Rotate();
         GetDirection();
         ApplyMove();
@@ -87,6 +92,6 @@ public class ThirdPersonController
     }
     // ============================================================================================//
     bool IsMoving { get { return Mathf.Abs(_moveInput.normalized.x) + Mathf.Abs(_moveInput.normalized.y) > _damping; } }
-    private bool IsUnderWater { get { return !BodyManager.IsBodyUnderWater(_myPlanetID); } }
+    private bool IsUnderWater { get { return !BodyManager.Instance.IsBodyUnderWater(_myPlanetID); } }
     // ============================================================================================//
 }

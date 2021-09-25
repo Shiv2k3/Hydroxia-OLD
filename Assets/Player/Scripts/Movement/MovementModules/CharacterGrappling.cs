@@ -29,10 +29,16 @@ public class CharacterGrappling : MonoBehaviour
     Coroutine moveToGrapple;
 
     WaitForFixedUpdate fixedUpdate = new WaitForFixedUpdate();
-    public bool UpdateState(bool grappelInput)
+    public bool UpdateState(bool grappelInput, AB_MB_Mount mount)
     {
         if (grappelInput)
         {
+           if(mount)
+            {
+                mount.Grapple();
+                return false;
+            }
+
             if (_grappled || _throwingGrapple || _movingToGrapple)
             {
                 if (throwGrapple != null) StopCoroutine(throwGrapple);

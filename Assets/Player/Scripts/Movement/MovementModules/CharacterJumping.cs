@@ -28,17 +28,17 @@ public class CharacterJumping
 
     void Jump()
     {
-        Vector3 dir = BodyManager.Instance.GetOnPlanet(_bodyID) ? _rb.position.normalized : Vector3.up;
+        Vector3 dir = BodyManager.Instance.GetOnPlanet() ? _rb.position.normalized : Vector3.up;
         _rb.AddForce(dir * _jumpPower, ForceMode.Impulse);
     }
 
     void Rise()
     {
-        Vector3 dir = BodyManager.Instance.GetOnPlanet(_bodyID) ? _rb.position.normalized : Vector3.up;
+        Vector3 dir = BodyManager.Instance.GetOnPlanet() ? _rb.position.normalized : Vector3.up;
         _rb.AddForce(dir * _swimUpPower, ForceMode.Force);
     }
 
-    public void Update(float value)
+    public void Update(AB_MB_Mount mount, float value)
     {
         if (value != 0)
         {

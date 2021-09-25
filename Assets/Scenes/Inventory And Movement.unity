@@ -7945,70 +7945,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 627710396, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: maxSpeed
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: offset.x
-      value: 0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: offset.y
-      value: 2.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: onPlanet
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: jumpPower
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: moveSpeed
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: useGravity
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: flyMaxSpeed
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: grappelRange
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: grappelStrength
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289897, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: movementDamping
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289899, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: attackLayer.m_Bits
-      value: 4608
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289899, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: interactLayer.m_Bits
-      value: 6400
-      objectReference: {fileID: 0}
     - target: {fileID: 1065532218926289900, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 13400000, guid: c8581e221ea7b314bbc2394367f11371, type: 2}
-    - target: {fileID: 1065532218926289901, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: m_Drag
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1065532218926289902, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -8056,14 +7996,6 @@ PrefabInstance:
     - target: {fileID: 1065532218926289903, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 1065532218926289903, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4650936306752483311, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 24744483b22cfdc44b8e8f5fb120bf4c, type: 3}
@@ -8469,6 +8401,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16
   bodies: []
+  waterCollisionDamping: 0.05
 --- !u!1 &1249519810
 GameObject:
   m_ObjectHideFlags: 0
