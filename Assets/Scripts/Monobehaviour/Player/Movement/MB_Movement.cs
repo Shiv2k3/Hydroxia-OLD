@@ -43,7 +43,7 @@ public class MB_Movement : MonoBehaviour
     [FoldoutGroup("Camera Settings")]
     [SerializeField] private Vector3 offset;
     [FoldoutGroup("Camera Settings")]
-    [SerializeField, MinMaxSlider(-180f,180f, true)] private Vector2 clamp;
+    [SerializeField, MinMaxSlider(-180f, 180f, true)] private Vector2 clamp;
     // ============================================================================================//
     [FoldoutGroup("Jump Settings")]
     [SerializeField] private LayerMask jumpableLayers;
@@ -72,7 +72,7 @@ public class MB_Movement : MonoBehaviour
     [FoldoutGroup("Grappel Settings")]
     [SerializeField] private float grappelRange = 25;
     [FoldoutGroup("Grappel Settings")]
-    [SerializeField, MinMaxSlider("@clamp",true)] Vector2 grappleClamp = new Vector2(-40,40);
+    [SerializeField, MinMaxSlider("@clamp", true)] Vector2 grappleClamp = new Vector2(-40, 40);
     [HideInInspector] private bool isUsingGrapple;
     // ============================================================================================//
     [FoldoutGroup("Flying Settings")]
@@ -83,7 +83,7 @@ public class MB_Movement : MonoBehaviour
     [SerializeField] private float flyMaxSpeed = 10;
     // ============================================================================================//
     [FoldoutGroup("Mount Setting")]
-    [SerializeField, ReadOnly] private AB_MB_Mount mount;
+    [SerializeField, ReadOnly] private AB_MB_Mount _mount;
     // ============================================================================================//
     [Header("Planet")]
     private int bodyID;
@@ -137,14 +137,14 @@ public class MB_Movement : MonoBehaviour
         {
             // UPDATE AND MOVE PLAYER
             player.UpdateInput(moveInput, lookInput, lookInputDir);
-            player.Move(mount);
+            player.Move(_mount);
 
-            flying.Update(mount, inputs.Player.Fly.ReadValue<float>(), onPlanet);
+            flying.Update(_mount, inputs.Player.Fly.ReadValue<float>(), onPlanet);
         }
 
         // UPDATE AND MOVE CAMERA
         cam.UpdateInput(lookInput, lookInputDir, playerRigidbody.position);
-        cam.Move(mount);
+        cam.Move(_mount);
 
         // MAX SPEED
         if (playerRigidbody.velocity.magnitude > maxSpeed)
@@ -158,13 +158,13 @@ public class MB_Movement : MonoBehaviour
         inventoryClosed = Cursor.lockState == CursorLockMode.Locked;
 
         // GRAPPELING
-        isUsingGrapple = grappling.UpdateState(inventoryClosed && inputs.Player.Grapple.triggered, mount);
+        isUsingGrapple = grappling.UpdateState(inventoryClosed && inputs.Player.Grapple.triggered, _mount);
 
         if (inventoryClosed && !isUsingGrapple)
         {
             // UPDATE JUMP AND CROUCH STATUS
-            jump.Update(mount, inputs.Player.Jump.ReadValue<float>());
-            crouch.Update(mount, inputs.Player.Crouch.ReadValue<float>());
+            jump.Update(_mount, inputs.Player.Jump.ReadValue<float>());
+            crouch.Update(_mount, inputs.Player.Crouch.ReadValue<float>());
         }
     }
     private void OnDisable()
@@ -187,7 +187,7 @@ public class MB_Movement : MonoBehaviour
     public void ToggleMovement(bool setActive) => canMove = setActive;
     public void ToggleMounted(AB_MB_Mount mount)
     {
-        this.mount = mount;
+        _mount = mount;
     }
     #endregion
 }

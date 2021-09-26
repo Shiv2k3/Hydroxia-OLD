@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class TileManager : MonoBehaviour
 {
+    #region SINGLETON
     private static TileManager _instance;
     public static TileManager Instance
     {
@@ -23,28 +24,18 @@ public class TileManager : MonoBehaviour
                 Destroy(value.gameObject);
         }
     }
+    #endregion
 
     [SerializeField] private float timeBetweenDrop = 0.5f;
-    private void Awake()
-    {
-        var players = FindObjectsOfType<MB_Interaction>();
-        for (int i = 0; i < players.Length; i++)
-        {
-            players[i].OnAttack += MB_Interaction_OnAttack;
-            Debug.Log("Tile Manager Was Subscribed To OnAttack");
-        }
-    }
-
-    MB_DroppableItem dropable;
     private void MB_Interaction_OnAttack(object sender, AttackCard attackCard)
     {
-        dropable = attackCard.attackable?.GetComponentInParent<MB_DroppableItem>();
+        MB_DroppableItem dropable = attackCard.attackedObject?.GetComponentInParent<MB_DroppableItem>();
         if (dropable)
         {
             dropable.Attacked(attackCard);
         }
         else
-            Debug.Log("You can't damage " + attackCard.attackable?.name + ", make sure the script MB_Dropable is attached to the parent of the collider you are hitting");
+            Debug.Log("You can't damage " + attackCard.attackedObject?.name + ", make sure the script MB_Dropable is attached to the parent of the collider you are hitting");
     }
 
     public static IEnumerator DropTileCoroutine(MB_DroppableItem item)

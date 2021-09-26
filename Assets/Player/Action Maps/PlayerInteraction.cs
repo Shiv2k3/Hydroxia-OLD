@@ -59,18 +59,18 @@ public class @PlayerInteraction : IInputActionCollection, IDisposable
                     ""interactions"": """"
                 },
                 {
-                    ""name"": ""Mouse Position"",
-                    ""type"": ""Value"",
-                    ""id"": ""c48c7a71-024d-40c4-b9b7-8f39253653f4"",
-                    ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
-                    ""interactions"": """"
-                },
-                {
                     ""name"": ""Shift"",
                     ""type"": ""Value"",
                     ""id"": ""28a70dd3-ae06-4c75-9faa-f3b6ccf2470e"",
                     ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Mount"",
+                    ""type"": ""Button"",
+                    ""id"": ""b4a61ecc-5ee0-4848-acf1-9bd840db1c06"",
+                    ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
                 }
@@ -122,17 +122,6 @@ public class @PlayerInteraction : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""7ba656f9-86a6-4310-ad2f-b8941a587f68"",
-                    ""path"": ""<Mouse>/position"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Mouse Position"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""ddcee5ef-0091-41ea-9467-4be28a7068f9"",
                     ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
@@ -152,6 +141,17 @@ public class @PlayerInteraction : IInputActionCollection, IDisposable
                     ""action"": ""Shift"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a3077493-367c-4a93-84cd-104c0e0abcd9"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Mount"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -165,8 +165,8 @@ public class @PlayerInteraction : IInputActionCollection, IDisposable
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_Inventory = m_Player.FindAction("Inventory", throwIfNotFound: true);
         m_Player_Selection = m_Player.FindAction("Selection", throwIfNotFound: true);
-        m_Player_MousePosition = m_Player.FindAction("Mouse Position", throwIfNotFound: true);
         m_Player_Shift = m_Player.FindAction("Shift", throwIfNotFound: true);
+        m_Player_Mount = m_Player.FindAction("Mount", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -221,8 +221,8 @@ public class @PlayerInteraction : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_Inventory;
     private readonly InputAction m_Player_Selection;
-    private readonly InputAction m_Player_MousePosition;
     private readonly InputAction m_Player_Shift;
+    private readonly InputAction m_Player_Mount;
     public struct PlayerActions
     {
         private @PlayerInteraction m_Wrapper;
@@ -232,8 +232,8 @@ public class @PlayerInteraction : IInputActionCollection, IDisposable
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
         public InputAction @Inventory => m_Wrapper.m_Player_Inventory;
         public InputAction @Selection => m_Wrapper.m_Player_Selection;
-        public InputAction @MousePosition => m_Wrapper.m_Player_MousePosition;
         public InputAction @Shift => m_Wrapper.m_Player_Shift;
+        public InputAction @Mount => m_Wrapper.m_Player_Mount;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -258,12 +258,12 @@ public class @PlayerInteraction : IInputActionCollection, IDisposable
                 @Selection.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSelection;
                 @Selection.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSelection;
                 @Selection.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSelection;
-                @MousePosition.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMousePosition;
-                @MousePosition.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMousePosition;
-                @MousePosition.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMousePosition;
                 @Shift.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShift;
                 @Shift.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShift;
                 @Shift.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShift;
+                @Mount.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMount;
+                @Mount.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMount;
+                @Mount.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMount;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -283,12 +283,12 @@ public class @PlayerInteraction : IInputActionCollection, IDisposable
                 @Selection.started += instance.OnSelection;
                 @Selection.performed += instance.OnSelection;
                 @Selection.canceled += instance.OnSelection;
-                @MousePosition.started += instance.OnMousePosition;
-                @MousePosition.performed += instance.OnMousePosition;
-                @MousePosition.canceled += instance.OnMousePosition;
                 @Shift.started += instance.OnShift;
                 @Shift.performed += instance.OnShift;
                 @Shift.canceled += instance.OnShift;
+                @Mount.started += instance.OnMount;
+                @Mount.performed += instance.OnMount;
+                @Mount.canceled += instance.OnMount;
             }
         }
     }
@@ -300,7 +300,7 @@ public class @PlayerInteraction : IInputActionCollection, IDisposable
         void OnInteract(InputAction.CallbackContext context);
         void OnInventory(InputAction.CallbackContext context);
         void OnSelection(InputAction.CallbackContext context);
-        void OnMousePosition(InputAction.CallbackContext context);
         void OnShift(InputAction.CallbackContext context);
+        void OnMount(InputAction.CallbackContext context);
     }
 }

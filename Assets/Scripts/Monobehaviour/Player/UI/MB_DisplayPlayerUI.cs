@@ -204,7 +204,7 @@ public class MB_DisplayPlayerUI : MonoBehaviour
 
                 inventorySlots[i].SetIndex(i);
             }
-            Debug.Log("Created inventory slots");
+           // Debug.Log("Created inventory slots");
 
             recipeSlots = new List<MB_RecipeUISlot>(defualtRecipeSlotsCount);
             for (int i = 0; i < defualtRecipeSlotsCount; i++)
@@ -212,7 +212,7 @@ public class MB_DisplayPlayerUI : MonoBehaviour
                 recipeSlots.Add(Instantiate(recipeSlotPrefab, recipePanel).gameObject.GetComponent<MB_RecipeUISlot>());
                 recipeSlots[i].SetIndex(i);
             }
-            Debug.Log("Created recipe slots");
+           // Debug.Log("Created recipe slots");
 
             ingredientsSlots = new List<MB_IngredientUISlot>(defualtIngredientsSlotsCount);
             for (int i = 0; i < defualtIngredientsSlotsCount; i++)
@@ -220,14 +220,14 @@ public class MB_DisplayPlayerUI : MonoBehaviour
                 ingredientsSlots.Add(Instantiate(ingredientsSlotPrefab, ingredientsPanel).gameObject.GetComponent<MB_IngredientUISlot>());
                 ingredientsSlots[i].SetIndex(i);
             }
-            Debug.Log("Created ingrident slots");
+          //  Debug.Log("Created ingrident slots");
 
             chestSlotsUI = new List<MB_ChestUISlot>(defualtChestSlotsCount);
             for (int i = 0; i < defualtChestSlotsCount; i++)
             {
                 AddNewChestSlot(i);
             }
-            Debug.Log("Created chest slots");
+          //  Debug.Log("Created chest slots");
         }
 
         if (!tweenPanels)

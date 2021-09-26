@@ -10,6 +10,12 @@ public class CharacterFlying
     private Vector3 lastPos;
     public void Update(AB_MB_Mount mount, float input, bool planet)
     {
+        if (mount)
+        {
+            mount.Fly();
+            return;
+        }
+
         if (input == 1)
         {
             if (FlyReady)

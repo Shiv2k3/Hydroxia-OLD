@@ -72,7 +72,8 @@ public class CharacterGrappling : MonoBehaviour
 
         for (float i = 0; i < steps; i++)
         {
-            if (Physics.CheckSphere(_hookT.position, 0.5f, _grappelableLayers))
+            yield return fixedUpdate;
+            if (Physics.CheckSphere(_hookT.position, 0.45f, _grappelableLayers))
             {
                 moveToGrapple = StartCoroutine(MoveToGrapple(_hookT.position));
                 _throwingGrapple = false;
@@ -80,7 +81,6 @@ public class CharacterGrappling : MonoBehaviour
             }
 
             _hookT.position = Vector3.Lerp(start, grappleTo, (i + 1) / steps);
-            yield return fixedUpdate;
         }
 
         StartCoroutine(RetractGrapple());
