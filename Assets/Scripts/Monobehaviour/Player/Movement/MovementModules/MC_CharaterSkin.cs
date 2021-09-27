@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class CharaterSkin
+public class C_CharaterSkin
 {
     private Transform _transform;
-    public CharaterSkin(Transform skin)
+    public C_CharaterSkin(Transform skin)
     {
         _transform = skin;
     }

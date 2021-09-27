@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
-public class ThirdPersonCamera
+public class MC_ThirdPersonCamera
 {
     private Camera cam;
     private readonly Transform _transform;
@@ -17,7 +17,7 @@ public class ThirdPersonCamera
     private Vector2 _lookInputDir;
     private readonly float _zDist;
     private readonly float _collisionDistance;
-    public ThirdPersonCamera(Camera camera, Vector3 offset, LayerMask collisionLayers, LayerMask playerLayer, float damping, float collisionDistance, Vector2 clamp)
+    public MC_ThirdPersonCamera(Camera camera, Vector3 offset, LayerMask collisionLayers, LayerMask playerLayer, float damping, float collisionDistance, Vector2 clamp)
     {
         _transform = camera.transform;
         _collisionLayers = collisionLayers;
@@ -28,7 +28,7 @@ public class ThirdPersonCamera
         _collisionDistance = collisionDistance;
     }
 
-    public void Move(AB_MB_Mount mount)
+    public void Move()
     {
         MoveToRotation();
     }

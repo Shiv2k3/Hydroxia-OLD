@@ -6,13 +6,13 @@ public class MB_Movement : MonoBehaviour
     #region PRAMETERS
     // ============================================================================================//
     [FoldoutGroup("References")]
-    [SerializeField] private PlayerMovement inputs;
+    [HideInInspector] public PlayerMovement inputs;
     [FoldoutGroup("References")]
     [SerializeField] private Rigidbody playerRigidbody;
     [FoldoutGroup("References")]
     [SerializeField] private new Camera camera;
     [FoldoutGroup("References")]
-    [SerializeField] private Transform playerSkin;
+    [SerializeField] public Transform playerSkin;
     // ============================================================================================//
     [FoldoutGroup("Settings")]
     [SerializeField] private bool hideCursor = true;
@@ -82,25 +82,24 @@ public class MB_Movement : MonoBehaviour
     [FoldoutGroup("Flying Settings")]
     [SerializeField] private float flyMaxSpeed = 10;
     // ============================================================================================//
-    [FoldoutGroup("Mount Setting")]
-    [SerializeField, ReadOnly] private AB_MB_Mount _mount;
+    [FoldoutGroup("Input Variables")]
+    [ReadOnly] private Vector2 moveInput;
+    [FoldoutGroup("Input Variables")]
+    [ReadOnly] private Vector2 lookInput;
+    [FoldoutGroup("Input Variables")]
+    [ReadOnly] private Vector2 lookInputDir;
     // ============================================================================================//
     [Header("Planet")]
     private int bodyID;
     // ============================================================================================//
-    [Header("Scripts")]
-    private ThirdPersonController player;
-    private ThirdPersonCamera cam;
-    private CharacterJumping jump;
-    private CharacterCrouching crouch;
-    private CharacterGrappling grappling;
-    private CharacterFlying flying;
-    // ============================================================================================//
-    [Header("Input Variables")]
-    private Vector2 moveInput;
-    private Vector2 lookInput;
-    private Vector2 lookInputDir;
-    // ============================================================================================//
+    #endregion
+    #region SCRIPTS
+    private MC_ThirdPersonController player;
+    private MC_ThirdPersonCamera cam;
+    private MC_CharacterJumping jump;
+    private MC_CharacterCrouching crouch;
+    private MC_CharacterGrappling grappling;
+    private MC_CharacterFlying flying;
     #endregion
     #region MB
     private void Awake()
@@ -119,12 +118,12 @@ public class MB_Movement : MonoBehaviour
         onPlanet = BodyManager.Instance.GetOnPlanet();
 
         //  MOVEMENT CLASSES INITIALIZATION
-        player = new ThirdPersonController(inputs, playerRigidbody, playerSkin, camera, movementDamping, bodyID, onPlanet, walkableLayers, maxSpeed);
-        cam = new ThirdPersonCamera(camera, offset, cameraCollisionLayers, playerLayer, movementDamping, cameraCollisionDistance, clamp);
-        jump = new CharacterJumping(playerRigidbody, jumpPower, swimUpPower, jumpCooldown, swimUpCooldown, jumpableLayers, bodyID);
-        crouch = new CharacterCrouching(playerRigidbody, divePower, diveCooldown, bodyID);
-        flying = new CharacterFlying(flySpeed, flyMaxSpeed, playerRigidbody, flyingCooldown);
-        grappling = gameObject.AddComponent<CharacterGrappling>();
+        player = new MC_ThirdPersonController(inputs, playerRigidbody, playerSkin, camera, movementDamping, bodyID, onPlanet, walkableLayers, maxSpeed);
+        cam = new MC_ThirdPersonCamera(camera, offset, cameraCollisionLayers, playerLayer, movementDamping, cameraCollisionDistance, clamp);
+        jump = new MC_CharacterJumping(playerRigidbody, jumpPower, swimUpPower, jumpCooldown, swimUpCooldown, jumpableLayers, bodyID);
+        crouch = new MC_CharacterCrouching(playerRigidbody, divePower, diveCooldown, bodyID);
+        flying = new MC_CharacterFlying(flySpeed, flyMaxSpeed, playerRigidbody, flyingCooldown);
+        grappling = gameObject.AddComponent<MC_CharacterGrappling>();
         grappling.Construct(camera, playerRigidbody, grappelRange, grappelStrength, grappelableLayers, grappelMachineTransform, grappleHookTransform, playerSkin, bodyID, grappleClamp);
     }
     private void FixedUpdate()
@@ -135,16 +134,23 @@ public class MB_Movement : MonoBehaviour
         #region EXEC MOVEMENT
         if (inventoryClosed && !isUsingGrapple)
         {
-            // UPDATE AND MOVE PLAYER
-            player.UpdateInput(moveInput, lookInput, lookInputDir);
-            player.Move(_mount);
+            if (Mount)
+            {
+                Mount.Move();
+                Mount.Fly();
+            }
+            else
+            {
+                player.UpdateInput(moveInput, lookInput, lookInputDir);
+                player.Move();
+                flying.Update(inputs.Player.Fly.ReadValue<float>(), onPlanet);
+            }
 
-            flying.Update(_mount, inputs.Player.Fly.ReadValue<float>(), onPlanet);
         }
 
         // UPDATE AND MOVE CAMERA
         cam.UpdateInput(lookInput, lookInputDir, playerRigidbody.position);
-        cam.Move(_mount);
+        cam.Move();
 
         // MAX SPEED
         if (playerRigidbody.velocity.magnitude > maxSpeed)
@@ -158,13 +164,21 @@ public class MB_Movement : MonoBehaviour
         inventoryClosed = Cursor.lockState == CursorLockMode.Locked;
 
         // GRAPPELING
-        isUsingGrapple = grappling.UpdateState(inventoryClosed && inputs.Player.Grapple.triggered, _mount);
+        if (inventoryClosed && inputs.Player.Grapple.triggered)
+            isUsingGrapple = Mount ? Mount.Grapple() : grappling.UpdateState();
 
         if (inventoryClosed && !isUsingGrapple)
         {
-            // UPDATE JUMP AND CROUCH STATUS
-            jump.Update(_mount, inputs.Player.Jump.ReadValue<float>());
-            crouch.Update(_mount, inputs.Player.Crouch.ReadValue<float>());
+            if (Mount)
+            {
+                Mount.Jump();
+                Mount.Crouch();
+            }
+            else
+            {
+                jump.Update(inputs.Player.Jump.ReadValue<float>());
+                crouch.Update(inputs.Player.Crouch.ReadValue<float>());
+            }
         }
     }
     private void OnDisable()
@@ -185,9 +199,6 @@ public class MB_Movement : MonoBehaviour
         lookInputDir.y = Mathf.Clamp(lookInputDir.y, clamp.x, clamp.y); // CLAMP X ROTATION
     }
     public void ToggleMovement(bool setActive) => canMove = setActive;
-    public void ToggleMounted(AB_MB_Mount mount)
-    {
-        _mount = mount;
-    }
+    public AB_MB_Mount Mount { get; set; }
     #endregion
 }

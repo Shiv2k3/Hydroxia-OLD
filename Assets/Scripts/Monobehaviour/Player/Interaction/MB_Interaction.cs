@@ -53,7 +53,7 @@ public class MB_Interaction : MonoBehaviour
     private void Update()
     {
         HotbarSelection();
-        if (AttackInput || InteractInput)
+        if (AttackInput || InteractInput || MountInput)
         {
             if (Cursor.lockState != CursorLockMode.Locked) return;
 
@@ -87,8 +87,14 @@ public class MB_Interaction : MonoBehaviour
                 {
                     playerRay.origin = raycastPoint.position;
                     playerRay.direction = (camRayHit.point - raycastPoint.position).normalized;
-                    Physics.Raycast(playerRay, out playerRayHit, range, interactLayer);
-                    interactCard.interactedObject = playerRayHit.transform.gameObject;
+
+                    if (Physics.Raycast(playerRay, out playerRayHit, range, interactLayer))
+                        interactCard.interactedObject = playerRayHit.transform.gameObject;
+                    else
+                    {
+                        interactCard.interactedObject = null;
+                        return;
+                    }
                 }
                 else
                 {
@@ -121,24 +127,24 @@ public class MB_Interaction : MonoBehaviour
     private void PerformAttack()
     {
         if (attackCard.weaponEquiped == null) return;
-        
+
         MB_DroppableItem droppableItem = attackCard.attackedObject.GetComponentInParent<MB_DroppableItem>();
         if (droppableItem)
             droppableItem.Attacked(attackCard);
     }
     private void PerformInteract()
     {
-        if (interactCard.interactedObject == null) return;
-
-        if (actions.Player.Mount.triggered)
+        if (MountInput)
         {
-            AB_MB_Mount mount = interactCard.interactedObject?.GetComponentInParent<AB_MB_Mount>();
+            AB_MB_Mount mount = interactCard.interactedObject.GetComponentInParent<AB_MB_Mount>();
             if (mount) mount.ToggleMount(interactCard);
             return;
         }
 
-        MB_DroppedItem droppedItem = interactCard.interactedObject?.GetComponent<MB_DroppedItem>();
-        if (droppedItem)
+        if (!InteractInput) return;
+
+        MB_DroppedItem droppedItem = interactCard.interactedObject.GetComponent<MB_DroppedItem>();
+        if ( droppedItem)
         {
             inventory.AddDroppedItemToInventory(droppedItem);
             return;
@@ -161,7 +167,8 @@ public class MB_Interaction : MonoBehaviour
             return false;
     }
     bool AttackInput => actions.Player.Attack.ReadValue<float>() == 1;
-    bool InteractInput => actions.Player.Interact.ReadValue<float>() == 1 || actions.Player.Mount.triggered;
+    bool InteractInput => actions.Player.Interact.ReadValue<float>() == 1;
+    bool MountInput => actions.Player.Mount.ReadValue<float>() == 1;
     int MouseDelta => (int)actions.Player.Selection.ReadValue<Vector2>().y;
     private void OnEnable()
     {
@@ -185,12 +192,12 @@ public class AttackCard
 public class InteractionCard
 {
     [HideInInspector] public MB_Movement playerMovement;
-    [HideInInspector] public PlayerInteraction playerActions;
+    [HideInInspector] public PlayerInteraction interactionInput;
     [ReadOnly] public GameObject interactedObject;
 
     public InteractionCard(MB_Movement playerMovement, PlayerInteraction playerActions)
     {
-        this.playerActions = playerActions;
+        this.interactionInput = playerActions;
         this.playerMovement = playerMovement;
     }
 }

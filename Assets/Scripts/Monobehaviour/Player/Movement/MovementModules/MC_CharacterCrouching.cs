@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CharacterCrouching
+public class MC_CharacterCrouching
 {
     private readonly Rigidbody _rb;
     private readonly int _myPlanetID;
@@ -9,7 +9,7 @@ public class CharacterCrouching
     private readonly float _diveCoolDown;
     private float _lastDiveTime;
 
-    public CharacterCrouching(Rigidbody rb, float divePower, float diveCooldown, int planetID)
+    public MC_CharacterCrouching(Rigidbody rb, float divePower, float diveCooldown, int planetID)
     {
         _rb = rb;
         _myPlanetID = planetID;
@@ -23,7 +23,7 @@ public class CharacterCrouching
         _rb.AddForce(_rb.position.normalized * -_divePower * Time.fixedDeltaTime, ForceMode.Impulse);
     }
 
-    public void Update(AB_MB_Mount mount, float value)
+    public void Update(float value)
     {
         if (value != 0)
         {

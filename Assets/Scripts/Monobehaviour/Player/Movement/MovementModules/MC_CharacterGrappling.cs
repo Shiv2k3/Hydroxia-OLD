@@ -3,11 +3,10 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class CharacterGrappling : MonoBehaviour
+public class MC_CharacterGrappling : MonoBehaviour
 {
     // REF
     private Rigidbody _rb;
-    private Transform _skin;
     private Camera _camera;
     private Transform _grappleT;
     private Transform _hookT;
@@ -30,37 +29,29 @@ public class CharacterGrappling : MonoBehaviour
     Coroutine moveToGrapple;
 
     WaitForFixedUpdate fixedUpdate = new WaitForFixedUpdate();
-    public bool UpdateState(bool grappelInput, AB_MB_Mount mount)
+    public bool UpdateState()
     {
-        if (grappelInput)
+        if (_grappled || _throwingGrapple || _movingToGrapple)
         {
-            if (mount)
-            {
-                mount.Grapple();
-                return false;
-            }
+            if (throwGrapple != null) StopCoroutine(throwGrapple);
+            if (moveToGrapple != null) StopCoroutine(moveToGrapple);
 
-            if (_grappled || _throwingGrapple || _movingToGrapple)
-            {
-                if (throwGrapple != null) StopCoroutine(throwGrapple);
-                if (moveToGrapple != null) StopCoroutine(moveToGrapple);
-
-                StartCoroutine(RetractGrapple());
-            }
-            else if (_retractingGrapple == false)
-            {
-                _cameraRay = _camera.ScreenPointToRay(Input.mousePosition);
-                Vector3 grappleTo = _camera.transform.position + (_cameraRay.direction * _grappleRange);
-                float angleToGraplle = Vector3.Angle(grappleTo, _cameraRay.direction) - 90;
-                if (angleToGraplle < _grappleClamp.y && angleToGraplle > _grappleClamp.x)
-                    throwGrapple = StartCoroutine(ThrowGrapple(grappleTo));
-            }
+            StartCoroutine(RetractGrapple());
+        }
+        else if (_retractingGrapple == false)
+        {
+            _cameraRay = _camera.ScreenPointToRay(Input.mousePosition);
+            Vector3 grappleTo = _camera.transform.position + (_cameraRay.direction * _grappleRange);
+            float angleToGraplle = Vector3.Angle(grappleTo, _cameraRay.direction) - 90;
+            if (angleToGraplle < _grappleClamp.y && angleToGraplle > _grappleClamp.x)
+                throwGrapple = StartCoroutine(ThrowGrapple(grappleTo));
         }
 
         bool usingGrapple = _movingToGrapple || _grappled;
 
         return usingGrapple;
     }
+    #region COROTUINES
     private IEnumerator ThrowGrapple(Vector3 grappleTo)
     {
         _throwingGrapple = true;
@@ -113,7 +104,6 @@ public class CharacterGrappling : MonoBehaviour
         _throwingGrapple = false;
 
         BodyManager.Instance.ToggleUseGravity(_bodyID, true);
-        _rb.AddForce(_rb.velocity * _grappleStrength, ForceMode.VelocityChange); // HOW TO MAKE IT HAVE A GOOD FORCE
         _rb.isKinematic = false;
 
         int steps = (int)(Vector3.Distance(_hookT.position, _grappleT.position) / _grappleStrength);
@@ -130,12 +120,17 @@ public class CharacterGrappling : MonoBehaviour
         _hookT.localRotation = Quaternion.identity;
         _retractingGrapple = false;
 
+        for (int i = 0; i < 10; i++) // STABLIZE 
+        {
+            _rb.velocity /= (i + 1);
+            yield return fixedUpdate;
+        }
     }
+    #endregion
     public void Construct(Camera camera, Rigidbody playerRigidbody, float grappelRange, float grappelStrength, LayerMask grappelableLayers, Transform grappelT, Transform hookT, Transform skin, int bodyID, Vector2 grappleClamp)
     {
         _camera = camera;
         _rb = playerRigidbody;
-        _skin = skin;
         _grappleRange = grappelRange;
         _grappleStrength = grappelStrength;
         _grappelableLayers = grappelableLayers;

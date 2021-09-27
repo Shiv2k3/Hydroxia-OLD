@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CharacterJumping
+public class MC_CharacterJumping
 {
     private LayerMask _jumpableLayers;
     private readonly Rigidbody _rb;
@@ -13,7 +13,7 @@ public class CharacterJumping
     private float _lastSwamUp;
     private readonly float _swimUpPower;
     private readonly float _swimUpCoolDown;
-    public CharacterJumping(Rigidbody rb, float jumpPower, float swimUpPower, float jumpCoolDown, float swimUpCoolDown, LayerMask jumpableLayers, int bodyID)
+    public MC_CharacterJumping(Rigidbody rb, float jumpPower, float swimUpPower, float jumpCoolDown, float swimUpCoolDown, LayerMask jumpableLayers, int bodyID)
     {
         _rb = rb;
         _jumpableLayers = jumpableLayers;
@@ -38,7 +38,7 @@ public class CharacterJumping
         _rb.AddForce(dir * _swimUpPower, ForceMode.Force);
     }
 
-    public void Update(AB_MB_Mount mount, float value)
+    public void Update(float value)
     {
         if (value != 0)
         {

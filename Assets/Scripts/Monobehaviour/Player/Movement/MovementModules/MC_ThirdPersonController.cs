@@ -1,10 +1,10 @@
 using UnityEngine;
-public class ThirdPersonController
+public class MC_ThirdPersonController
 {
     // ============================================================================================//
     private readonly PlayerMovement _inputs;
     private readonly Transform _camera;
-    private readonly CharaterSkin skin;
+    private readonly C_CharaterSkin skin;
     private readonly Rigidbody _rb;
     // ============================================================================================//
     private readonly bool _applyPlanetRotation;
@@ -20,7 +20,7 @@ public class ThirdPersonController
     private Vector2 _lookInput;
     private Vector2 _lookInputDir;
     // ============================================================================================//
-    public ThirdPersonController(PlayerMovement inputActions, Rigidbody rb, Transform playerSkin, Camera camera, float damping, int myID, bool applyPlanetRotation, LayerMask walkableLayers, float maxSpeed)
+    public MC_ThirdPersonController(PlayerMovement inputActions, Rigidbody rb, Transform playerSkin, Camera camera, float damping, int myID, bool applyPlanetRotation, LayerMask walkableLayers, float maxSpeed)
     {
         _rb = rb;
         _rotation = rb.rotation;
@@ -32,17 +32,12 @@ public class ThirdPersonController
         _applyPlanetRotation = applyPlanetRotation;
 
         // WATER MOVEMENT INIT
-        skin = new CharaterSkin(playerSkin);
+        skin = new C_CharaterSkin(playerSkin);
         _inputs = inputActions;
     }
     // ============================================================================================//
-    public void Move(AB_MB_Mount mount)
+    public void Move()
     {
-        if (mount)
-        {
-            mount.Move();
-            return;
-        }
         Rotate();
         GetDirection();
         ApplyMove();

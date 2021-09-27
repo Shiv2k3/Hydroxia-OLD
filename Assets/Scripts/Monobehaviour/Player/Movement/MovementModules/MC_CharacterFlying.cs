@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CharacterFlying
+public class MC_CharacterFlying
 {
     private float _maxSpeed;
     private float _speed;
@@ -8,13 +8,8 @@ public class CharacterFlying
     private float _cooldown;
     private float _lastFlapped;
     private Vector3 lastPos;
-    public void Update(AB_MB_Mount mount, float input, bool planet)
+    public void Update(float input, bool planet)
     {
-        if (mount)
-        {
-            mount.Fly();
-            return;
-        }
 
         if (input == 1)
         {
@@ -39,7 +34,7 @@ public class CharacterFlying
     }
     bool FlyReady => Time.time > _lastFlapped + _cooldown;
 
-    public CharacterFlying(float speed, float maxSpeed, Rigidbody rigidbody, float cooldown)
+    public MC_CharacterFlying(float speed, float maxSpeed, Rigidbody rigidbody, float cooldown)
     {
         _rb = rigidbody;
         _maxSpeed = maxSpeed;
