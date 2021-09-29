@@ -14,7 +14,7 @@ public class MC_MountMovement
     public void Update(Vector2 moveInput)
     {
         _moveInput.x = moveInput.x;
-        _moveInput.z = moveInput.y;
+        _moveInput.z = moveInput.y;  
 
         mount.position += _moveInput;
     }

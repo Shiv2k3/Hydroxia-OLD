@@ -4,7 +4,7 @@ public class MC_ThirdPersonController
     // ============================================================================================//
     private readonly PlayerMovement _inputs;
     private readonly Transform _camera;
-    private readonly C_CharaterSkin skin;
+    private readonly MC_CharaterSkin skin;
     private readonly Rigidbody _rb;
     // ============================================================================================//
     private readonly bool _applyPlanetRotation;
@@ -32,7 +32,7 @@ public class MC_ThirdPersonController
         _applyPlanetRotation = applyPlanetRotation;
 
         // WATER MOVEMENT INIT
-        skin = new C_CharaterSkin(playerSkin);
+        skin = new MC_CharaterSkin(playerSkin);
         _inputs = inputActions;
     }
     // ============================================================================================//
@@ -65,15 +65,15 @@ public class MC_ThirdPersonController
             _rotation = Quaternion.FromToRotation(_rotation * Vector3.up, _rb.position.normalized) * Quaternion.AngleAxis(_lookInput.x, _rotation * Vector3.up) * _rotation;
     }
     // ============================================================================================//
+    Vector3 direction;
     private void ApplyMove()
     {
         Vector3 up = _rotation * Vector3.up;
-        Vector3 direction = _forward + _right;
+        direction = Vector3.Lerp(direction, _forward + _right, _damping);
 
         Ray ray = new Ray(_rb.position + up / 1.5f, direction);
-        if (_rb.velocity.magnitude < _maxSpeed && !Physics.Raycast(ray, 1.1f, _walkableLayers))
+        if (!Physics.Raycast(ray, 1.1f, _walkableLayers))
             _rb.MovePosition(_rb.position + direction);
-
 
         if (_applyPlanetRotation) _rotation = Quaternion.FromToRotation(_rb.rotation * Vector3.up, _rb.position.normalized) * _rotation;
         _rb.MoveRotation(_moveInput == Vector2.zero ? _rb.rotation : _rotation);

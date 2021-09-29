@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
@@ -21,7 +22,7 @@ public class MB_Movement : MonoBehaviour
     [FoldoutGroup("Settings")]
     [SerializeField] private float sensitivity = 0.14f;
     [FoldoutGroup("Settings")]
-    [Range(0.5f, 1)] [SerializeField] private float movementDamping = 0.5f;
+    [SerializeField] private float movementDamping = 0.5f;
     // ============================================================================================//
     [FoldoutGroup("Movement Settings")]
     [SerializeField] private LayerMask walkableLayers;
@@ -83,11 +84,11 @@ public class MB_Movement : MonoBehaviour
     [SerializeField] private float flyMaxSpeed = 10;
     // ============================================================================================//
     [FoldoutGroup("Input Variables")]
-    [ReadOnly] private Vector2 moveInput;
+    [ReadOnly] public Vector2 moveInput;
     [FoldoutGroup("Input Variables")]
-    [ReadOnly] private Vector2 lookInput;
+    [ReadOnly] public Vector2 lookInput;
     [FoldoutGroup("Input Variables")]
-    [ReadOnly] private Vector2 lookInputDir;
+    [ReadOnly] public Vector2 lookInputDir;
     // ============================================================================================//
     [Header("Planet")]
     private int bodyID;
@@ -126,6 +127,7 @@ public class MB_Movement : MonoBehaviour
         grappling = gameObject.AddComponent<MC_CharacterGrappling>();
         grappling.Construct(camera, playerRigidbody, grappelRange, grappelStrength, grappelableLayers, grappelMachineTransform, grappleHookTransform, playerSkin, bodyID, grappleClamp);
     }
+    Vector3 lastPos;
     private void FixedUpdate()
     {
         // GET AND PROCESS INPUT
@@ -152,11 +154,6 @@ public class MB_Movement : MonoBehaviour
         cam.UpdateInput(lookInput, lookInputDir, playerRigidbody.position);
         cam.Move();
 
-        // MAX SPEED
-        if (playerRigidbody.velocity.magnitude > maxSpeed)
-        {
-            playerRigidbody.velocity = playerRigidbody.velocity.normalized * maxSpeed;
-        }
         #endregion
     }
     private void Update()
@@ -180,6 +177,15 @@ public class MB_Movement : MonoBehaviour
                 crouch.Update(inputs.Player.Crouch.ReadValue<float>());
             }
         }
+
+        Vector3 dir = (lastPos - playerRigidbody.position).normalized;
+        float mag = Vector3.Distance(Vector3.up, dir) > Vector3.Distance(Vector3.down, dir) ? 1 : -1;
+        float currSpeed = mag * playerRigidbody.velocity.magnitude;
+
+        if (playerRigidbody.velocity.magnitude > currSpeed)
+            playerRigidbody.velocity = Vector3.ClampMagnitude(playerRigidbody.velocity, maxSpeed);
+
+        lastPos = playerRigidbody.position;
     }
     private void OnDisable()
     {
@@ -192,11 +198,18 @@ public class MB_Movement : MonoBehaviour
         // GET INPUT
         moveInput = Vector2.Lerp(moveInput, inputs.Player.Movement.ReadValue<Vector2>() * moveSpeed * Time.deltaTime, movementDamping);
         lookInput = Vector2.Lerp(lookInput, inputs.Player.Look.ReadValue<Vector2>() * sensitivity, movementDamping);
+
         if (inventoryClosed) lookInputDir += lookInput;
 
         // PROCESS INPUT
         if (moveInput != Vector2.zero && canMove) lookInputDir.x = Mathf.Lerp(lookInputDir.x, 0, movementDamping); // ZERO Y ROTATION IF MOVING
         lookInputDir.y = Mathf.Clamp(lookInputDir.y, clamp.x, clamp.y); // CLAMP X ROTATION
+
+        if (moveInput.x < 0.01f && moveInput.x > -0.01f) moveInput.x = 0;
+        if (moveInput.y < 0.01f && moveInput.y > -0.01f) moveInput.y = 0;
+        if (lookInput.x < 0.01f && lookInput.x > -0.01f) lookInput.x = 0;
+        if (lookInput.y < 0.01f && lookInput.y > -0.01f) lookInput.y = 0;
+
     }
     public void ToggleMovement(bool setActive) => canMove = setActive;
     public AB_MB_Mount Mount { get; set; }

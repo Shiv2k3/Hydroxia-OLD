@@ -48,6 +48,14 @@ public class AB_MB_Mount : MonoBehaviour
                 Dismount();
         }
     }
+    private void FixedUpdate()
+    {
+        if (Mounted)
+        {
+            player.transform.position = _saddle.position;
+        }
+    }
+
     #endregion
     #region MOVEMENT METHODS
     public virtual void Move()
